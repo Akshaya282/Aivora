@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zero Complaint System · ABT-CPD · Team Aivora</title>
+<style>
+:root{--bg:#faf9f6;--card:#fff;--ink:#14130f;--ink2:#55534d;--muted:#8a877e;--line:#e8e5de;--blue:#2a78d6;--blue-d:#12417f;--red:#e34948;--amber:#eda100;--green:#1baf7a;--orange:#eb6834;--violet:#6250d6;--shadow:0 1px 2px rgba(20,19,15,.05),0 6px 18px rgba(20,19,15,.05)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(120deg,#12417f,#2a78d6);color:#fff;padding:18px 24px}
+header .in{max-width:1280px;margin:auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+header h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.2px}header p{margin:2px 0 0;opacity:.85;font-size:13px}
+.pill{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:4px 12px;border-radius:99px;font-size:12px}
+nav{position:sticky;top:0;z-index:20;background:rgba(250,249,246,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .in{max-width:1280px;margin:auto;display:flex;gap:4px;overflow-x:auto;padding:8px 16px}
+nav button{border:0;background:transparent;padding:8px 14px;border-radius:99px;font:inherit;font-weight:600;color:var(--ink2);cursor:pointer;white-space:nowrap}
+nav button:hover{background:#efede7}nav button[aria-selected=true]{background:var(--ink);color:#fff}
+nav button.quest[aria-selected=false]{color:#b45309;background:#fff4e0}
+main{max-width:1280px;margin:auto;padding:20px 16px 60px}
+.panel{display:none}.panel.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:16px;box-shadow:var(--shadow)}
+.filters label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+select,input[type=number]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-width:110px}
+.filters .count{margin-left:auto;font-weight:700}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g5{grid-template-columns:repeat(5,1fr)}.g32{grid-template-columns:3fr 2fr}
+@media(max-width:900px){.g2,.g3,.g5,.g32{grid-template-columns:1fr 1fr}}@media(max-width:600px){.g2,.g3,.g5,.g32{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);min-width:0}
+.card h3{margin:0 0 4px;font-size:15px}.card .sub{color:var(--muted);font-size:12.5px;margin:0 0 10px}
+h2{font-size:18px;margin:22px 0 8px}
+.kpi .l{font-size:12px;color:var(--muted)}.kpi .v{font-size:28px;font-weight:750;letter-spacing:-.5px}.kpi .d{font-size:12px;font-weight:600}
+.good{color:#0a7a52}.bad{color:var(--red)}
+.alert{border-radius:14px;padding:12px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.alert.red{background:#fdecec;border:1px solid #f6c3c2}.alert.amber{background:#fff6e0;border:1px solid #f2d99a}
+.alert b{font-weight:700}.btn{border:0;border-radius:99px;padding:8px 16px;font:inherit;font-weight:650;cursor:pointer;background:var(--ink);color:#fff}
+.btn:hover{filter:brightness(1.15)}.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}table.t th{text-align:left;color:var(--muted);font-weight:600;font-size:12px;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.t td{padding:7px 8px;border-bottom:1px solid #f1efe9;vertical-align:middle}table.t tr:hover td{background:#faf8f3}
+.bar{height:8px;border-radius:4px;background:#ece9e1;overflow:hidden;min-width:60px}.bar i{display:block;height:100%;border-radius:4px;background:var(--blue)}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700}
+.tag.High{background:#fdecec;color:#b42323}.tag.Medium{background:#fff2d1;color:#8a5a00}.tag.Low{background:#e5f1fc;color:#1d5ca8}
+.tag.Proven{background:#e5f1fc;color:#1d5ca8}.tag.Moderate{background:#eeece6;color:#55534d}.tag.Weak{background:#fdecec;color:#b42323}
+.heatwrap{overflow-x:auto}table.heat{border-collapse:separate;border-spacing:2px;font-size:12px;width:100%}
+table.heat th{font-weight:600;color:var(--ink2);padding:2px 4px;text-align:center;font-size:11.5px;vertical-align:bottom}
+table.heat th.r{text-align:right;white-space:nowrap;padding-right:8px}
+table.heat td{height:34px;min-width:52px;text-align:center;border-radius:6px;cursor:default;font-weight:600;transition:transform .12s}
+table.heat td.cl{cursor:pointer}table.heat td.cl:hover{transform:scale(1.08);outline:2px solid var(--ink)}table.heat td.sel{outline:2px solid var(--ink)}
+.chartbox{position:relative;height:300px}.chartbox.tall{height:420px}
+.cb{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:13px}.cb .n{width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cb .bar{flex:1}.cb .p{width:44px;text-align:right;color:var(--ink2)}
+.note{font-size:12.5px;color:var(--muted)}details summary{cursor:pointer;font-weight:600}
+.steps{margin:6px 0 0;padding-left:20px;color:var(--ink2);font-size:13px}.steps li{margin:2px 0}
+.ew{border-left:4px solid var(--red);background:#fff;border-radius:10px;padding:10px 14px;margin:8px 0;box-shadow:var(--shadow)}
+/* ---------- QUEST ---------- */
+.questbg{background:linear-gradient(160deg,#fff7e6 0%,#ffeede 45%,#eaf3ff 100%);border:1px solid #f4dcb4;border-radius:22px;padding:20px}
+.qgrid{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:18px}@media(max-width:900px){.qgrid{grid-template-columns:1fr}}
+.qcard{background:#fff;border-radius:22px;padding:26px 26px 22px;box-shadow:0 10px 30px rgba(120,80,20,.14);text-align:center;transition:transform .35s ease,opacity .35s ease;position:relative}
+.qcard.leave{transform:translateX(70px) rotate(4deg) scale(.96);opacity:0}.qcard.enter{animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.9) translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.qemoji{font-size:64px;line-height:1;display:inline-block;animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+.qcard h3{font-size:24px;margin:8px 0 2px;letter-spacing:-.3px}.qmeta{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:6px 0 10px}
+.chip{background:#f4f1ea;border-radius:99px;padding:3px 11px;font-size:12px;font-weight:600;color:var(--ink2)}.chip.r{background:#fdecec;color:#b42323}
+.qwhy{color:var(--ink2);margin:6px auto;max-width:520px}.qplay{background:#f7f5ef;border-radius:14px;padding:10px 14px;margin:10px auto;max-width:540px;text-align:left;font-size:14px}
+.qq{font-size:20px;font-weight:700;margin:14px 0 12px;letter-spacing:-.2px}
+.ans{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ans button{border:2px solid transparent;border-radius:16px;padding:12px 18px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:transform .12s,box-shadow .12s;min-width:150px}
+.ans button:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 8px 18px rgba(0,0,0,.12)}.ans button:active{transform:scale(.97)}
+.ans .y{background:#d9f5e8;color:#0a6a46;border-color:#9fe0c3}.ans .w{background:#e5f1fc;color:#17508f;border-color:#a8cdf3}.ans .n{background:#fff0dc;color:#8a4b00;border-color:#f3cf9c}
+.ans small{display:block;font-weight:500;font-size:11.5px;opacity:.8}
+.react button{font-size:34px;background:#fff;border:2px solid var(--line);border-radius:18px;padding:8px 18px;cursor:pointer;transition:transform .12s}.react button:hover{transform:scale(1.18) rotate(-5deg)}
+.toast{min-height:26px;margin-top:12px;font-weight:600;color:#7a4a00}
+.hero{background:#fff;border-radius:22px;padding:18px;box-shadow:0 10px 30px rgba(20,60,120,.1)}
+.lvl{display:flex;align-items:center;gap:12px}.lvl .av{font-size:44px}.lvl b{font-size:18px}
+.xpbar{height:12px;background:#ece9e1;border-radius:8px;overflow:hidden;margin:8px 0 2px}.xpbar i{display:block;height:100%;background:linear-gradient(90deg,#eda100,#eb6834);border-radius:8px;transition:width .6s cubic-bezier(.2,1,.3,1)}
+.shield{margin-top:14px}.shield .ring{height:16px;border-radius:10px;background:#fdecec;overflow:hidden}.shield .ring i{display:block;height:100%;background:linear-gradient(90deg,#1baf7a,#2a78d6);transition:width .8s cubic-bezier(.2,1,.3,1)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px}
+.badge{background:#f7f5ef;border-radius:14px;padding:8px;text-align:center;font-size:11.5px;filter:grayscale(1);opacity:.45;transition:.4s}.badge.on{filter:none;opacity:1;background:#fff4d6;animation:pop .5s}
+.badge span{display:block;font-size:26px}
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}@media(max-width:800px){.board{grid-template-columns:1fr 1fr}}
+.col{background:rgba(255,255,255,.7);border-radius:14px;padding:10px;min-height:90px}.col h4{margin:0 0 6px;font-size:12.5px;color:var(--ink2)}
+.mchip{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 9px;margin:4px 0;font:inherit;font-size:12.5px;cursor:pointer}.mchip:hover{border-color:var(--ink)}
+.prog{display:flex;gap:5px;justify-content:center;margin-bottom:12px}.prog i{width:26px;height:6px;border-radius:4px;background:#e8e2d4}.prog i.d{background:var(--green)}.prog i.w{background:var(--blue)}.prog i.n{background:var(--amber)}.prog i.c{background:var(--ink)}
+.float{position:fixed;font-weight:800;color:#d97706;pointer-events:none;animation:up 1.1s ease-out forwards;z-index:60;font-size:22px;text-shadow:0 2px 8px #fff}
+@keyframes up{from{transform:translateY(0);opacity:1}to{transform:translateY(-70px);opacity:0}}
+canvas#conf{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.ct{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700}.ct.High{background:#dcf5ea;color:#0a6a46}.ct.Medium{background:#fff2d1;color:#8a5a00}.ct.Low{background:#fdecec;color:#b42323}
+.trustbox{background:#f7f9fd;border:1px solid #dbe6f5;border-radius:14px;padding:12px 14px}.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:10px 0}.mini div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px}.mini b{display:block;font-size:20px}.mini span{font-size:11.5px;color:var(--muted)}
+input[type=range]{width:100%}textarea{font:inherit;width:100%;min-height:84px;padding:10px;border:1px solid var(--line);border-radius:10px;resize:vertical}
+.meter{height:14px;border-radius:8px;background:#ece9e1;overflow:hidden}.meter i{display:block;height:100%;border-radius:8px}.spin{display:inline-block;animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+footer{max-width:1280px;margin:0 auto;padding:0 16px 30px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header><div class="in"><div><h1>🎯 Zero Customer Complaint · Analytics, Prediction &amp; Prevention</h1><p>ABT-CPD · Team Aivora · Sakthi Hackathon 2.0 · Round 2</p></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><span class="pill" id="asof"></span><span class="pill">Prototype · synthetic data</span></div></div></header>
+<nav><div class="in" role="tablist" id="tabs"></div></nav>
+<main>
+<div id="filters" class="filters"></div>
+<section class="panel" id="p-overview"></section>
+<section class="panel" id="p-pareto"></section>
+<section class="panel" id="p-trends"></section>
+<section class="panel" id="p-chronic"></section>
+<section class="panel" id="p-rel"></section>
+<section class="panel" id="p-risk"></section>
+<section class="panel" id="p-advisor"></section>
+<section class="panel" id="p-trust"></section>
+<section class="panel" id="p-live"></section>
+<section class="panel" id="p-quest"></section>
+</main>
+<footer id="foot"></footer>
+<canvas id="conf"></canvas>
+<script>/*__CHARTJS__*/</script>
+<script>
+"use strict";
+const D = /*__DATA__*/null;
+const LIVE = !!(D && D.live);
+const $ = (s, el = document) => el.querySelector(s), $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const CATCOL = {"Infestation":"#2a78d6","Packaging Issue":"#eb6834","Contamination / Foreign Matter":"#1baf7a","Product Quality Deviation":"#eda100","Physical Defect":"#e87ba4","Sensory Characteristics":"#008300","Weight / Quantity":"#6250d6","Process-Related Defect":"#e34948","Other":"#9aa0a6"};
+const SHORT = {"Contamination / Foreign Matter":"Foreign matter","Product Quality Deviation":"Quality dev.","Process-Related Defect":"Process defect","Sensory Characteristics":"Sensory","Weight / Quantity":"Weight","Packaging Issue":"Packaging","Physical Defect":"Physical"};
+const sh = c => SHORT[c] || c;
+const BLUE = "#2a78d6", RED = "#e34948", GREY = "#9aa0a6", AMBER = "#eda100";
+const R = D.rec.map(r => ({y:r[0], m:r[1], mi:r[2], p:r[3], cu:r[4], ca:r[5], rc:r[6], ac:r[7], sv:r[8], ef:r[9], rp:r[10], cl:r[11]}));
+const NM = Math.max(...R.map(r => r.mi)) + 1;
+const S = {y0: Math.min(...R.map(r => r.y)), y1: Math.max(...R.map(r => r.y)), p: -1, cu: -1};
+const YMIN = S.y0, YMAX = S.y1;
+let F = R, active = "overview";
+const riskMap = {}; D.risk.forEach(r => { (riskMap[r.p] = riskMap[r.p] || {})[r.c] = r; });
+const pct = (x, d = 0) => (x * 100).toFixed(d) + "%";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const bandTag = b => `<span class="tag ${b}">${b}</span>`;
+function applyFilter() { F = R.filter(r => r.y >= S.y0 && r.y <= S.y1 && (S.p < 0 || r.p === S.p) && (S.cu < 0 || r.cu === S.cu)); }
+const count = (arr, f) => { const m = new Map(); arr.forEach(r => { const k = f(r); if (k == null || k < 0) return; m.set(k, (m.get(k) || 0) + 1); }); return m; };
+
+Chart.defaults.font.family = 'system-ui,-apple-system,"Segoe UI",Roboto,sans-serif'; Chart.defaults.font.size = 12; Chart.defaults.color = "#55534d";
+Chart.defaults.animation.duration = 450; Chart.defaults.maintainAspectRatio = false; Chart.defaults.plugins.legend.labels.usePointStyle = true;
+const charts = {};
+function mk(id, cfg) { if (charts[id]) charts[id].destroy(); charts[id] = new Chart(document.getElementById(id), cfg); }
+const grid = {color: "#eeebe4"};
+
+function heat(rows, cols, M, o = {}) {
+  const max = Math.max(...M.flat(), o.max || 1e-9), f = o.fmt || (v => v);
+  let h = `<div class="heatwrap"><table class="heat"><thead><tr><th></th>${cols.map(c => `<th title="${esc(c)}">${esc(o.colShort ? o.colShort(c) : c)}</th>`).join("")}</tr></thead><tbody>`;
+  rows.forEach((r, i) => {
+    h += `<tr><th class="r">${esc(r)}</th>`;
+    cols.forEach((c, j) => {
+      const v = M[i][j], t = Math.min(v / max, 1), rr = Math.round(238 - t * (238 - 18)), gg = Math.round(244 - t * (244 - 65)), bb = Math.round(252 - t * (252 - 127));
+      h += `<td class="${o.click ? "cl" : ""}" data-i="${i}" data-j="${j}" style="background:rgb(${rr},${gg},${bb});color:${t > .5 ? "#fff" : "#14130f"}" title="${esc(r)} · ${esc(c)}: ${f(v)}">${v ? f(v) : ""}</td>`;
+    });
+    h += "</tr>";
+  });
+  return h + "</tbody></table></div>";
+}
+function bars(items, color = BLUE, fmt = v => v) { // [{n, v, max?}]
+  const mx = Math.max(...items.map(i => i.v), 1e-9);
+  return items.map(i => `<div class="cb"><div class="n" title="${esc(i.n)}">${esc(i.n)}</div><div class="bar"><i style="width:${i.v / mx * 100}%;background:${i.c || color}"></i></div><div class="p">${fmt(i.v)}</div></div>`).join("");
+}
+
+/* ---------------- tabs & filters ---------------- */
+const TABS = [["overview","Overview & KPIs"],["pareto","Pareto & Themes"],["trends","Trends"],["chronic","Chronic & Actions"],["rel","Relationships"],["risk","Risk & Early Warning"],["advisor","Preventive Advisor"],["trust","Model Trust"],["live","🤖 Live AI"],["quest","🎮 Prevention Quest"]];
+const FILTERED = new Set(["overview","pareto","trends","rel"]);
+$("#tabs").innerHTML = TABS.map(([k, l]) => `<button role="tab" data-k="${k}" class="${k === "quest" ? "quest" : ""}" aria-selected="false">${l}</button>`).join("");
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.k); });
+function go(k) {
+  active = k; try { sessionStorage.setItem('zcc_tab', k); } catch (e) {} $$("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+  $$(".panel").forEach(p => p.classList.toggle("on", p.id === "p-" + k)); $("#filters").style.display = FILTERED.has(k) ? "flex" : "none";
+  render(); window.scrollTo({top: 0});
+}
+function buildFilters() {
+  const yrs = Array.from({length: YMAX - YMIN + 1}, (_, i) => YMIN + i);
+  $("#filters").innerHTML = `<label>From year<select id="fy0">${yrs.map(y => `<option ${y === S.y0 ? "selected" : ""}>${y}</option>`).join("")}</select></label>
+  <label>To year<select id="fy1">${yrs.map(y => `<option ${y === S.y1 ? "selected" : ""}>${y}</option>`).join("")}</select></label>
+  <label>Product<select id="fp"><option value="-1">All products</option>${D.prods.map((p, i) => `<option value="${i}">${p}</option>`).join("")}</select></label>
+  <label>Customer<select id="fc"><option value="-1">All customers</option>${D.custs.map((p, i) => `<option value="${i}">${p}</option>`).join("")}</select></label>
+  <button class="btn alt" id="freset">Reset</button><div class="count"><span id="fcount"></span> complaints in view</div>`;
+  const upd = () => { S.y0 = +$("#fy0").value; S.y1 = +$("#fy1").value; if (S.y0 > S.y1) { S.y1 = S.y0; $("#fy1").value = S.y1; } S.p = +$("#fp").value; S.cu = +$("#fc").value; render(); };
+  $$("#filters select").forEach(s => s.addEventListener("change", upd));
+  $("#freset").onclick = () => { S.y0 = YMIN; S.y1 = YMAX; S.p = S.cu = -1; buildFilters(); render(); };
+}
+function render() { applyFilter(); $("#fcount") && ($("#fcount").textContent = F.length.toLocaleString()); ({overview, pareto, trends, chronic, rel, risk, advisor, trust, live, quest})[active](); }
+
+/* ---------------- 1 overview ---------------- */
+function overview() {
+  const k = D.kpi, hi = D.risk.filter(r => r.band === "High").sort((a, b) => b.prob - a.prob);
+  const d = (a, b, inv = true, f = v => v.toFixed(0)) => { const x = a - b; return `<span class="d ${(x <= 0) === inv ? "good" : "bad"}">${x > 0 ? "▲" : x < 0 ? "▼" : "•"} ${f(Math.abs(x))} vs prior 12 m</span>`; };
+  let h = "";
+  if (hi.length) h += `<div class="alert red"><span style="font-size:22px">🚨</span><div><b>${hi.length} high-risk combinations predicted for ${D.forecast}:</b> ${hi.slice(0, 3).map(r => `${D.prods[r.p]} → ${sh(D.cats[r.c])} (${pct(r.prob)})`).join("; ")}.${D.ew.length ? ` ${D.ew.length} early-warning alert${D.ew.length > 1 ? "s" : ""} active.` : ""}</div><div style="margin-left:auto;display:flex;gap:8px"><button class="btn alt" onclick="go('risk')">See risks</button><button class="btn" onclick="go('quest')">🎮 Start the Prevention Quest</button></div></div>`;
+  h += `<div class="grid g5">
+   <div class="card kpi"><div class="l">Complaints, last 12 months</div><div class="v">${k.complaints_12m}</div>${d(k.complaints_12m, k.complaints_prev)}</div>
+   <div class="card kpi"><div class="l">Complaints per 100 t shipped</div><div class="v">${k.rate_12m.toFixed(2)}</div>${d(k.rate_12m, k.rate_prev, true, v => v.toFixed(2))}</div>
+   <div class="card kpi"><div class="l">Critical complaints</div><div class="v">${k.critical_12m}</div>${d(k.critical_12m, k.critical_prev)}</div>
+   <div class="card kpi"><div class="l">Repeat complaints</div><div class="v">${k.repeat_pct.toFixed(0)}%</div>${d(k.repeat_pct, k.repeat_prev, true, v => v.toFixed(1) + " pts")}</div>
+   <div class="card kpi"><div class="l">Corrective actions effective</div><div class="v">${k.effective_pct.toFixed(0)}%</div><span class="d" style="color:var(--muted)">target &gt; 90%</span></div></div>
+  <div class="grid g32" style="margin-top:14px"><div class="card"><h3>Complaints per 100 tonnes: actual vs. glide-path to zero</h3><p class="sub">Full calendar years. Dashed line = target of −30% each year.</p><div class="chartbox"><canvas id="c-annual"></canvas></div></div>
+  <div class="card"><h3>KPI scorecard</h3><p class="sub">Measurable KPIs for the journey to zero</p><table class="t"><thead><tr><th>KPI</th><th>Now</th><th>Target</th></tr></thead><tbody>
+   <tr><td>Complaints / 100 t</td><td>${k.rate_12m.toFixed(2)}</td><td>${(k.rate_12m * .7).toFixed(2)} (−30%/yr)</td></tr>
+   <tr><td>Critical complaints</td><td>${k.critical_12m}</td><td>0</td></tr>
+   <tr><td>Repeat share</td><td>${k.repeat_pct.toFixed(0)}%</td><td>&lt; 20%</td></tr>
+   <tr><td>Action effectiveness</td><td>${k.effective_pct.toFixed(0)}%</td><td>&gt; 90%</td></tr>
+   <tr><td>Avg closure (days)</td><td>${k.closure_days.toFixed(1)}</td><td>&lt; 7</td></tr>
+   <tr><td>Chronic pairs flagged</td><td>${D.chronic.filter(c => c.chronic_score > 80).length}</td><td>0</td></tr>
+   <tr><td>Early-warning lead time</td><td>next-month forecast</td><td>≥ 30 days</td></tr></tbody></table></div></div>
+  <div class="card" style="margin-top:14px"><h3>Complaint themes discovered by clustering</h3><p class="sub">TF-IDF + K-Means on complaint text, no labels needed. ${pct(D.metrics.unlabeled)} of records arrived with no category and were classified by the NLP model (accuracy ${pct(D.metrics.acc, 1)} on held-out complaints).</p>
+  <table class="t"><thead><tr><th>#</th><th>Top terms</th><th>Dominant type</th><th>Dominant product</th><th>Complaints</th><th>Last 12 m</th></tr></thead><tbody>${D.themes.map(t => `<tr><td>${t.theme}</td><td>${esc(t.top_terms)}</td><td>${esc(sh(t.dominant_category))}</td><td>${esc(t.dominant_product)}</td><td>${t.complaints}</td><td>${t.last_12m}</td></tr>`).join("")}</tbody></table></div>`;
+  $("#p-overview").innerHTML = h;
+  const a = D.annual, last = a[a.length - 1], yrs = a.map(x => x.year); for (let i = 1; i <= 4; i++) yrs.push(last.year + i);
+  const act = a.map(x => x.per_100t).concat([null, null, null, null]), gl = a.map(() => null); gl[gl.length - 1] = last.per_100t; for (let i = 1; i <= 4; i++) gl.push(last.per_100t * Math.pow(.7, i));
+  mk("c-annual", {type: "line", data: {labels: yrs, datasets: [{label: "Actual", data: act, borderColor: BLUE, backgroundColor: BLUE, borderWidth: 2.5, pointRadius: 4, tension: .25}, {label: "Glide-path (−30%/yr)", data: gl, borderColor: RED, backgroundColor: RED, borderDash: [6, 5], borderWidth: 2.5, pointRadius: 4, tension: .25}]},
+    options: {interaction: {mode: "index", intersect: false}, scales: {y: {beginAtZero: true, grid, title: {display: true, text: "complaints per 100 t"}}, x: {grid: {display: false}}}, plugins: {tooltip: {callbacks: {label: c => c.parsed.y == null ? null : ` ${c.dataset.label}: ${c.parsed.y.toFixed(2)}`}}}}});
+}
+
+/* ---------------- 2 pareto ---------------- */
+let paretoDim = "category";
+function pareto() {
+  const dims = {category: [r => r.ca, D.cats], product: [r => r.p, D.prods], customer: [r => r.cu, D.custs], "root cause": [r => r.rc, D.rcs], "corrective action": [r => r.ac, D.acts], line: [r => D.line[r.p], null]};
+  $("#p-pareto").innerHTML = `<div class="card"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><h3 style="margin:0">Pareto of complaints by</h3><select id="pdim">${Object.keys(dims).map(k => `<option ${k === paretoDim ? "selected" : ""}>${k}</option>`).join("")}</select></div><p class="sub" id="pcap"></p><div class="chartbox tall"><canvas id="c-par"></canvas></div></div>`;
+  $("#pdim").onchange = e => { paretoDim = e.target.value; pareto(); };
+  const [fn, names] = dims[paretoDim]; const m = count(F, fn);
+  let rows = [...m.entries()].map(([k, v]) => [names ? names[k] : k, v]).sort((a, b) => b[1] - a[1]).slice(0, 12); const tot = [...m.values()].reduce((a, b) => a + b, 0) || 1; let c = 0;
+  const share = rows.map(r => r[1] / tot * 100), cum = share.map(s => (c += s)); const n80 = cum.findIndex(v => v >= 80) + 1;
+  $("#pcap").textContent = `Top ${n80 || rows.length} ${paretoDim} values account for ~80% of the ${tot.toLocaleString()} complaints in view. Bars and line share one axis (%).`;
+  mk("c-par", {type: "bar", data: {labels: rows.map(r => r[0]), datasets: [{type: "line", label: "Cumulative %", data: cum, borderColor: "#eb6834", backgroundColor: "#eb6834", borderWidth: 2.5, pointRadius: 4, order: 0}, {label: "Share of complaints (%)", data: share, backgroundColor: BLUE, borderRadius: 4, order: 1}, {type: "line", label: "80% line", data: rows.map(() => 80), borderColor: GREY, borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, order: 2}]},
+    options: {interaction: {mode: "index", intersect: false}, scales: {y: {min: 0, max: 100, grid, title: {display: true, text: "% of complaints"}}, x: {grid: {display: false}, ticks: {autoSkip: false, maxRotation: 40, callback(v) { const l = this.getLabelForValue(v); return l.length > 22 ? l.slice(0, 21) + "…" : l; }}}}, plugins: {tooltip: {callbacks: {label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}${c.dataset.label.includes("%") ? "" : "%"}`}}}}});
+}
+
+/* ---------------- 3 trends ---------------- */
+function trends() {
+  $("#p-trends").innerHTML = `<div class="card"><h3>Rolling 12-month complaints by category</h3><p class="sub">Hover for exact values. Click a legend entry to hide or show a category.</p><div class="chartbox tall"><canvas id="c-roll"></canvas></div></div>
+  <div class="grid g2" style="margin-top:14px"><div class="card"><h3>Seasonality: complaints by calendar month</h3><p class="sub">Darker = more complaints. Look for monsoon-season peaks.</p><div id="seas"></div></div>
+  <div class="card"><h3>Severity mix by year</h3><p class="sub">Critical = foreign matter and infestation.</p><div class="chartbox"><canvas id="c-sev"></canvas></div></div></div>`;
+  const per = D.cats.map(() => new Array(NM).fill(0)); F.forEach(r => per[r.ca][r.mi]++);
+  const labels = [], t0 = D.t0; for (let i = 0; i < NM; i++) { const m = (t0[1] - 1 + i) % 12, y = t0[0] + Math.floor((t0[1] - 1 + i) / 12); labels.push(`${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][m]} ${y}`); }
+  const roll = a => a.map((_, i) => i < 11 ? null : a.slice(i - 11, i + 1).reduce((x, y) => x + y, 0));
+  mk("c-roll", {type: "line", data: {labels, datasets: D.cats.map((c, i) => ({label: c, data: roll(per[i]), borderColor: CATCOL[c], backgroundColor: CATCOL[c], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: .2}))},
+    options: {interaction: {mode: "index", intersect: false}, scales: {y: {beginAtZero: true, grid, title: {display: true, text: "complaints (12 months)"}}, x: {grid: {display: false}, ticks: {maxTicksLimit: 10}}}, plugins: {tooltip: {itemSort: (a, b) => b.parsed.y - a.parsed.y}}}});
+  const sm = D.cats.map(() => new Array(12).fill(0)); F.forEach(r => sm[r.ca][r.m - 1]++);
+  $("#seas").innerHTML = heat(D.cats.map(sh), ["J","F","M","A","M","J","J","A","S","O","N","D"], sm);
+  const yrs = []; for (let y = S.y0; y <= S.y1; y++) yrs.push(y);
+  const sv = [0, 1, 2].map(s => yrs.map(y => F.filter(r => r.y === y && r.sv === s).length)); const sc = [GREY, AMBER, RED];
+  mk("c-sev", {type: "bar", data: {labels: yrs, datasets: D.sevs.map((s, i) => ({label: s, data: sv[i], backgroundColor: sc[i], borderColor: "#fff", borderWidth: 1.5}))}, options: {interaction: {mode: "index", intersect: false}, scales: {x: {stacked: true, grid: {display: false}}, y: {stacked: true, grid}}}});
+}
+
+/* ---------------- 4 chronic ---------------- */
+function chronic() {
+  const ac = D.actions.slice().sort((a, b) => a.effective_pct - b.effective_pct), weak = D.actions.filter(a => a.verdict.startsWith("Weak"));
+  const used = D.actions.reduce((s, a) => s + a.times_used, 0), wu = weak.reduce((s, a) => s + a.times_used, 0);
+  $("#p-chronic").innerHTML = `<div class="card"><h3>Chronic and recurring problem areas (last 10 years)</h3><p class="sub">Chronic score = persistence across years (35%) + repeat-complaint rate (35%) + volume (30%). Repeat = same product, category and root cause again within 12 months.</p>
+  <table class="t"><thead><tr><th>Product</th><th>Complaint type</th><th>Complaints</th><th>Years active</th><th>Repeat %</th><th>Ineffective action %</th><th>Last 12 m</th><th>Chronic score</th></tr></thead><tbody>
+  ${D.chronic.map(c => `<tr><td>${esc(c.product)}</td><td>${esc(sh(c.category))}</td><td>${c.complaints}</td><td>${c.active_years}/10</td><td>${c.repeat_pct}%</td><td>${c.ineffective_pct}%</td><td>${c.last_12m} <span class="note">(prev ${c.prev_12m})</span></td><td><div style="display:flex;gap:8px;align-items:center"><div class="bar" style="width:90px"><i style="width:${c.chronic_score}%;background:${c.chronic_score >= 80 ? RED : BLUE}"></i></div><b>${c.chronic_score.toFixed(0)}</b>${c.chronic_score >= 80 ? ' <span class="tag High">CHRONIC</span>' : ""}</div></td></tr>`).join("")}</tbody></table></div>
+  <div class="card" style="margin-top:14px"><h3>Which corrective actions actually work?</h3><p class="sub">Share of cases where the action was recorded as effective. Hover for how often it was used.</p><div class="chartbox tall"><canvas id="c-act"></canvas></div>
+  <div class="alert amber" style="margin:12px 0 0"><span style="font-size:20px">⚠️</span><div><b>${(wu / used * 100).toFixed(0)}% of all corrective actions are weak ones</b> (${weak.map(w => `${esc(w.corrective_action)} ${w.effective_pct}%`).join(", ")}). Pair them with a proven fix or replace them.</div></div></div>`;
+  mk("c-act", {type: "bar", data: {labels: ac.map(a => a.corrective_action), datasets: [{label: "Effective %", data: ac.map(a => a.effective_pct), backgroundColor: ac.map(a => a.verdict.startsWith("Weak") ? RED : a.verdict === "Moderate" ? GREY : BLUE), borderRadius: 4}]},
+    options: {indexAxis: "y", scales: {x: {max: 100, grid, title: {display: true, text: "% effective"}}, y: {grid: {display: false}}}, plugins: {legend: {display: false}, tooltip: {callbacks: {afterLabel: c => `Used ${ac[c.dataIndex].times_used}× · repeat ${ac[c.dataIndex].repeat_pct}% · ${ac[c.dataIndex].verdict}`}}}}});
+}
+
+/* ---------------- 5 relationships ---------------- */
+let relSel = null;
+function lift(rowFn, colFn, rows, cols, minN) {
+  const m = new Map(), rt = new Map(), ct = new Map(); let tot = 0;
+  F.forEach(r => { const a = rowFn(r), b = colFn(r); if (a < 0 || b < 0) return; const k = a + "|" + b; m.set(k, (m.get(k) || 0) + 1); rt.set(a, (rt.get(a) || 0) + 1); ct.set(b, (ct.get(b) || 0) + 1); tot++; });
+  return [...m.entries()].map(([k, n]) => { const [a, b] = k.split("|").map(Number); return {row: rows[a], col: cols[b], n, share: n / rt.get(a) * 100, lift: n / rt.get(a) / (ct.get(b) / tot)}; }).filter(x => x.n >= minN).sort((a, b) => b.lift - a.lift).slice(0, 8);
+}
+function rel() {
+  $("#p-rel").innerHTML = `<div class="grid g2"><div class="card"><h3>Product × complaint type</h3><p class="sub">Click a cell to see its root causes and proven fixes.</p><div id="h1"></div></div><div class="card"><h3>Customer × complaint type</h3><p class="sub">Which customers see which problems.</p><div id="h2"></div></div></div>
+  <div class="card" id="drill" style="margin-top:14px;display:none"></div>
+  <div class="card" style="margin-top:14px"><h3>Product × root cause (14 most frequent)</h3><div id="h3"></div></div>
+  <h2>Does the process explain the complaints?</h2><p class="note">Complaint rate per 100 t shipped across five equal-size bands of the process parameter (product-month level, full history).</p>
+  <div class="grid g2"><div class="card"><h3>Infestation by grain moisture band</h3><p class="sub" id="bi"></p><div class="chartbox"><canvas id="c-bi"></canvas></div></div><div class="card"><h3>Packaging complaints by sealing-temperature band</h3><p class="sub" id="bp"></p><div class="chartbox"><canvas id="c-bp"></canvas></div></div></div>
+  <h2>Who sees what? (lift &gt; 1 = more than average)</h2><div class="grid g2"><div class="card"><h3>Customer → complaint type</h3><div id="l1"></div></div><div class="card"><h3>Product → root cause</h3><div id="l2"></div></div></div>`;
+  const ca = D.cats, M1 = D.prods.map(() => ca.map(() => 0)), M2 = D.custs.map(() => ca.map(() => 0)); F.forEach(r => { M1[r.p][r.ca]++; M2[r.cu][r.ca]++; });
+  $("#h1").innerHTML = heat(D.prods, ca, M1, {click: 1, colShort: sh}); $("#h2").innerHTML = heat(D.custs, ca, M2, {colShort: sh});
+  $("#h1").onclick = e => { const td = e.target.closest("td.cl"); if (td) { relSel = [+td.dataset.i, +td.dataset.j]; drill(); } };
+  const top = [...count(F, r => r.rc).entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(x => x[0]); const M3 = D.prods.map(() => top.map(() => 0)); F.forEach(r => { const j = top.indexOf(r.rc); if (j >= 0) M3[r.p][j]++; });
+  $("#h3").innerHTML = heat(D.prods, top.map(i => D.rcs[i]), M3, {colShort: s => s.length > 16 ? s.slice(0, 15) + "…" : s});
+  const bi = D.b_inf, bp = D.b_pack, bc = (id, d, col, xl) => mk(id, {type: "bar", data: {labels: d.map(x => x.band), datasets: [{label: "complaints / 100 t", data: d.map(x => x.per_100t), backgroundColor: col, borderRadius: 5}]}, options: {scales: {y: {beginAtZero: true, grid, title: {display: true, text: "complaints / 100 t"}}, x: {grid: {display: false}, title: {display: true, text: xl}}}, plugins: {legend: {display: false}, tooltip: {callbacks: {afterLabel: c => `${d[c.dataIndex].complaints} complaints · ${d[c.dataIndex].months} product-months`}}}}});
+  bc("c-bi", bi, BLUE, "average moisture band (%)"); bc("c-bp", bp, "#eb6834", "average sealing temperature band (°C)");
+  $("#bi").textContent = `Wettest band has ${(bi[bi.length - 1].per_100t / bi[0].per_100t).toFixed(1)}× the infestation rate of the driest.`; $("#bp").textContent = `Coolest-seal band has ${(bp[0].per_100t / bp[bp.length - 1].per_100t).toFixed(1)}× the packaging rate of the hottest.`;
+  const mn = F.length < 2000 ? 8 : 20, lt = (L, a, b) => `<table class="t"><thead><tr><th>${a}</th><th>${b}</th><th>Share</th><th>Lift</th><th>n</th></tr></thead><tbody>${L.map(x => `<tr><td>${esc(x.row)}</td><td>${esc(sh(x.col))}</td><td>${x.share.toFixed(1)}%</td><td><b>${x.lift.toFixed(2)}×</b></td><td>${x.n}</td></tr>`).join("")}</tbody></table>`;
+  $("#l1").innerHTML = lt(lift(r => r.cu, r => r.ca, D.custs, D.cats, mn), "Customer", "Type"); $("#l2").innerHTML = lt(lift(r => r.p, r => r.rc, D.prods, D.rcs, mn), "Product", "Root cause");
+  if (relSel) drill();
+}
+function drill() {
+  const [p, c] = relSel, sub = F.filter(r => r.p === p && r.ca === c && r.rc >= 0), el = $("#drill"); el.style.display = "block";
+  $$("#h1 td.sel").forEach(t => t.classList.remove("sel")); const td = $(`#h1 td[data-i="${p}"][data-j="${c}"]`); td && td.classList.add("sel");
+  const rcs = [...count(sub, r => r.rc).entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+  el.innerHTML = `<h3>${esc(D.prods[p])} · ${esc(D.cats[c])}: what drives it and what fixes it</h3><p class="sub">${F.filter(r => r.p === p && r.ca === c).length} complaints in view.</p>` + (rcs.length ? `<div class="grid g2"><div><b>Root causes</b>${bars(rcs.map(([k, v]) => ({n: D.rcs[k], v: v / sub.length * 100})), BLUE, v => v.toFixed(0) + "%")}</div><div><b>Proven fixes</b>${fixList(rcs.slice(0, 2).map(x => x[0]))}</div></div>` : `<p class="note">No root-cause records for this selection.</p>`) + `<p style="margin-top:8px"><button class="btn alt" onclick="adv.p=${p};adv.c=${c};go('advisor')">Open in Preventive Advisor →</button></p>`;
+}
+function actStats(rc) { const m = new Map(); R.forEach(r => { if (r.rc !== rc || r.ac < 0 || r.ef < 0) return; const a = m.get(r.ac) || {n: 0, e: 0}; a.n++; a.e += r.ef; m.set(r.ac, a); }); return [...m.entries()].filter(([, a]) => a.n >= 8).map(([k, a]) => ({ac: k, n: a.n, eff: a.e / a.n * 100})).sort((a, b) => b.eff - a.eff); }
+function fixList(rcList) { return rcList.map(rc => `<div style="margin:6px 0"><span class="note">${esc(D.rcs[rc])}</span>${actStats(rc).slice(0, 2).map(a => `<div>${D.fun[D.acts[a.ac]] ? D.fun[D.acts[a.ac]].e : ""} ${esc(D.acts[a.ac])} <span class="tag ${a.eff >= 75 ? "Proven" : a.eff >= 45 ? "Moderate" : "Weak"}">${a.eff.toFixed(0)}%</span></div>`).join("")}</div>`).join(""); }
+
+/* ---------------- 6 risk ---------------- */
+let riskSel = null;
+function risk() {
+  const top = D.risk.slice().sort((a, b) => b.prob - a.prob).slice(0, 10), m = D.metrics, ew = D.ew;
+  $("#p-risk").innerHTML = `<div class="card"><h3>Predicted risk for ${D.forecast}: probability of at least one complaint</h3><p class="sub">Gradient-boosting model on product × category × month (recent complaint counts, seasonality, process parameters, shipment volume). Click a cell.</p><div id="rh"></div><div id="rsel" style="margin-top:10px"></div></div>
+  <div class="grid g32" style="margin-top:14px"><div class="card"><h3>Top-10 risk combinations</h3><table class="t"><thead><tr><th>Product</th><th>Type</th><th>Risk</th><th>90% interval</th><th>Confidence</th><th>vs usual</th><th>Band</th></tr></thead><tbody>${top.map(r => `<tr><td>${esc(D.prods[r.p])}</td><td>${esc(sh(D.cats[r.c]))}</td><td><b>${pct(r.prob)}</b></td><td>${r.lo != null ? pct(r.lo) + "–" + pct(r.hi) : "–"}</td><td>${r.conf ? `<span class="ct ${r.conf}">${r.conf}</span>` : "–"}</td><td>${r.up.toFixed(2)}×</td><td>${bandTag(r.band)}</td></tr>`).join("")}</tbody></table></div>
+  <div class="card"><h3>🚨 Early-warning alerts</h3>${ew.length ? ew.map(e => `<div class="ew"><b>${esc(e.product)}</b> · ${esc(e.indicator)} <span class="note">(signal ${e.z_score})</span><br><span class="note">Risk of ${esc(sh(e.linked_category))}</span><br>→ ${esc(e.action)}</div>`).join("") : "<p>No early-warning indicators breached.</p>"}<button class="btn" style="margin-top:8px" onclick="go('quest')">🎮 Play the preventive missions</button></div></div>
+  <h2>High-risk processes and production lines</h2><p class="note">Process risk index = Σ over products and complaint types of P(complaint next month) × P(root cause | product, type). It shows which process failure modes should drive next month's complaints. “vs usual” compares with the 24-month norm.</p>
+  <div class="grid g32"><div class="card"><h3>Process failure modes, ranked by predicted contribution</h3><div class="chartbox tall"><canvas id="c-proc"></canvas></div></div><div class="card"><h3>By process area</h3><div class="chartbox tall"><canvas id="c-area"></canvas></div></div></div>
+  <div class="card" style="margin-top:14px"><h3>Production lines: expected complaint events next month vs usual</h3><table class="t"><thead><tr><th>Line</th><th>Products</th><th>Expected</th><th>Usual</th><th>vs usual</th><th>Highest risk</th><th>Hottest signal</th></tr></thead><tbody>${D.lines.map(l => `<tr><td><b>${l.line}</b></td><td>${esc(l.products)}</td><td>${l.expected_events}</td><td>${l.usual_events}</td><td><span class="tag ${l.vs_usual_x >= 1.15 ? "High" : l.vs_usual_x >= 1 ? "Medium" : "Low"}">${l.vs_usual_x}×</span></td><td>${esc(l.top_risk)} (${pct(l.top_risk_prob)})</td><td>${esc(l.hottest_signal)} (${l.hottest_uplift}× usual)</td></tr>`).join("")}</tbody></table></div>
+  <details class="card" style="margin-top:14px"><summary>Model validation (honest numbers)</summary><p>Time-based split: trained up to ${m.test_from}, tested on the following 36 months (${m.n_test_r.toLocaleString()} product-category-months). ROC-AUC <b>${m.auc}</b> (0.50 = chance). Brier score <b>${m.brier}</b> vs ${m.brier_naive} for a no-skill baseline (lower is better). Complaint text classifier: accuracy <b>${pct(m.acc, 1)}</b>, macro-F1 <b>${m.f1}</b> on ${m.n_test_c.toLocaleString()} held-out complaints. Prototype uses synthetic data; re-validate on real ABT-CPD records.</p></details>`;
+  const cols = D.cats, M = D.prods.map((_, p) => cols.map((_, c) => (riskMap[p] && riskMap[p][c]) ? riskMap[p][c].prob : 0));
+  $("#rh").innerHTML = heat(D.prods, cols, M, {click: 1, max: 1, fmt: v => Math.round(v * 100) + "%", colShort: sh});
+  $("#rh").onclick = e => { const td = e.target.closest("td.cl"); if (!td) return; riskSel = [+td.dataset.i, +td.dataset.j]; showRiskSel(); };
+  if (riskSel) showRiskSel();
+  const pc = D.proc.slice().sort((a, b) => b.risk_index - a.risk_index).slice(0, 12), bc = {High: RED, Medium: AMBER, Low: BLUE};
+  mk("c-proc", {type: "bar", data: {labels: pc.map(x => x.root_cause), datasets: [{label: "risk index", data: pc.map(x => x.risk_index), backgroundColor: pc.map(x => bc[x.band]), borderRadius: 4}]}, options: {indexAxis: "y", scales: {x: {grid, title: {display: true, text: "risk index"}}, y: {grid: {display: false}}}, plugins: {legend: {display: false}, tooltip: {callbacks: {afterLabel: c => `${pc[c.dataIndex].process_area} · ${pc[c.dataIndex].vs_usual_x}× usual · ${pc[c.dataIndex].band}`}}}}});
+  mk("c-area", {type: "bar", data: {labels: D.area.map(x => x.process_area), datasets: [{label: "risk index", data: D.area.map(x => x.risk_index), backgroundColor: BLUE, borderRadius: 4}]}, options: {indexAxis: "y", scales: {x: {grid}, y: {grid: {display: false}}}, plugins: {legend: {display: false}, tooltip: {callbacks: {afterLabel: c => `Top: ${D.area[c.dataIndex].top_failure_mode} (${D.area[c.dataIndex].max_vs_usual}× usual)`}}}}});
+}
+let wiT = null;
+function showRiskSel() {
+  const [p, c] = riskSel, r = riskMap[p][c]; $$("#rh td.sel").forEach(x => x.classList.remove("sel")); const td = $(`#rh td[data-i="${p}"][data-j="${c}"]`); td && td.classList.add("sel");
+  const ms = D.missions.filter(m => m.product === D.prods[p] && m.category === D.cats[c]).length;
+  $("#rsel").innerHTML = `<div class="trustbox"><div id="rbox"></div>
+  <div style="margin-top:10px"><button class="btn alt" onclick="adv.p=${p};adv.c=${c};go('advisor')">Open advisor →</button> ${ms ? `<button class="btn" onclick="go('quest')">🎮 ${ms} mission${ms > 1 ? "s" : ""} for this</button>` : ""}</div>
+  <details style="margin-top:10px" ${LIVE ? "open" : ""}><summary>What-if: change the process and re-run the model ${LIVE ? "" : "(needs python server.py)"}</summary>
+  <div class="grid g2" style="margin-top:8px"><label class="note">Grain moisture drift: <b id="vm">0</b> σ<input type="range" id="sm" min="-3" max="3" step="0.5" value="0" ${LIVE ? "" : "disabled"}></label>
+  <label class="note">Sealing temperature drift: <b id="vs">0</b> σ<input type="range" id="ss" min="-3" max="3" step="0.5" value="0" ${LIVE ? "" : "disabled"}></label></div><div id="wi" class="note" style="margin-top:6px"></div><div class="note" style="margin-top:4px">Note: next-month risk is driven mostly by recent complaint history, so process changes move it modestly (a few points; up to ~13 for infestation on Rice Flour). The direct process effect on complaint <i>rates</i> is on the Relationships tab.</div></details></div>`;
+  paintRisk(r, null); const run = () => { $("#vm").textContent = $("#sm").value; $("#vs").textContent = $("#ss").value; clearTimeout(wiT); wiT = setTimeout(() => whatIf(p, c), 180); };
+  $("#sm").oninput = run; $("#ss").oninput = run; if (LIVE) whatIf(p, c);
+}
+function paintRisk(r, live) {
+  const prob = live ? live.probability : r.prob, lo = live ? live.ci_low : r.lo, hi = live ? live.ci_high : r.hi, conf = live ? live.confidence : r.conf, agree = live ? live.model_agreement : r.agree, thr = D.thr, p = riskSel[0], c = riskSel[1];
+  $("#rbox").innerHTML = `<b>${esc(D.prods[p])} · ${esc(D.cats[c])}</b> ${bandTag(live ? live.band : r.band)} ${conf ? `<span class="ct ${conf}">Confidence: ${conf}</span>` : ""}
+  <div class="mini"><div><b>${pct(prob)}</b><span>chance of ≥1 complaint in ${D.forecast}</span></div><div><b>${lo != null ? pct(lo) + "–" + pct(hi) : "–"}</b><span>90% interval (${D.perf ? D.perf.boot_models : 15} bootstrap models)</span></div>
+  <div><b>${agree != null ? pct(agree) : "–"}</b><span>of models say “alert”</span></div><div><b>${prob >= thr ? "ALERT" : "No alert"}</b><span>alert threshold ${pct(thr)}</span></div></div>
+  ${live ? `<p class="note" style="margin:4px 0">Track record: when the model said about <b>${pct(live.track_record.said)}</b>, a complaint followed <b>${pct(live.track_record.happened)}</b> of the time (n=${live.track_record.n}, held-out 36 months). ${live.what_if.moisture_sd || live.what_if.seal_sd ? "<b>What-if values applied.</b>" : ""}</p>` : ""}
+  ${conf === "Low" ? `<p class="note" style="margin:4px 0;color:#b42323">Low confidence: the models disagree because this pattern is recent or rare in history. Treat it as a prompt to inspect, not a certainty.</p>` : ""}`;
+}
+async function whatIf(p, c) {
+  if (!LIVE) return; const dm = $("#sm").value, ds = $("#ss").value;
+  try { const j = await (await fetch(`/api/predict?product=${encodeURIComponent(D.prods[p])}&category=${encodeURIComponent(D.cats[c])}&dz_moist=${dm}&dz_seal=${ds}`)).json(); if (j.error) throw j.error; paintRisk(riskMap[p][c], j);
+    $("#wi").textContent = (+dm || +ds) ? `With moisture ${dm >= 0 ? "+" : ""}${dm}σ and sealing temperature ${ds >= 0 ? "+" : ""}${ds}σ the model now predicts ${pct(j.probability)} (${j.vs_usual}× usual).` : "Move a slider to see how the live model reacts. 0 = current conditions."; }
+  catch (e) { $("#wi").textContent = "Live model not reachable. Start it with: python server.py"; }
+}
+
+/* ---------------- 7 advisor ---------------- */
+const adv = {p: null, c: null};
+function advisor() {
+  if (adv.p == null) { const t = D.risk.slice().sort((a, b) => b.prob - a.prob)[0]; adv.p = t.p; adv.c = t.c; }
+  const r = riskMap[adv.p] && riskMap[adv.p][adv.c];
+  $("#p-advisor").innerHTML = `<div class="card"><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end"><label class="note">Product<br><select id="ap">${D.prods.map((p, i) => `<option value="${i}" ${i === adv.p ? "selected" : ""}>${p}</option>`).join("")}</select></label>
+  <label class="note">Complaint type<br><select id="ac">${D.cats.map((p, i) => `<option value="${i}" ${i === adv.c ? "selected" : ""}>${p}</option>`).join("")}</select></label></div>
+  ${r ? `<p style="margin:12px 0 0"><b>Predicted risk of ${esc(D.cats[adv.c])} for ${esc(D.prods[adv.p])} in ${D.forecast}: ${pct(r.prob)}</b> ${bandTag(r.band)} <span class="note">(${r.up.toFixed(2)}× its usual level)</span></p>` : ""}</div><div id="advbody"></div>`;
+  $("#ap").onchange = e => { adv.p = +e.target.value; advisor(); }; $("#ac").onchange = e => { adv.c = +e.target.value; advisor(); };
+  const end = Math.max(...R.map(x => x.mi)); let sub = R.filter(x => x.p === adv.p && x.ca === adv.c && x.rc >= 0 && x.mi > end - 60); if (sub.length < 15) sub = R.filter(x => x.ca === adv.c && x.rc >= 0);
+  const rcs = [...count(sub, x => x.rc).entries()].sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const recs = rcs.map(([rc, n]) => ({rc, lk: n / sub.length * 100, acts: actStats(rc)}));
+  $("#advbody").innerHTML = `<div class="grid g32" style="margin-top:14px"><div class="card"><h3>Likely root causes (recent history)</h3>${bars(rcs.map(([k, v]) => ({n: D.rcs[k], v: v / sub.length * 100})), BLUE, v => v.toFixed(0) + "%")}
+   <h3 style="margin-top:16px">Standard preventive checks before dispatch</h3><ul class="steps">${(D.generic[D.cats[adv.c]] || []).map(g => `<li>${esc(g)}</li>`).join("")}</ul></div>
+  <div class="card"><h3>Preventive methods, ranked by proven effectiveness</h3><p class="sub">Click “How to do it” for the steps.</p>${recs.map(x => `<div style="margin:8px 0 14px"><b>${esc(D.rcs[x.rc])}</b> <span class="note">(${x.lk.toFixed(0)}% of cases)</span>${x.acts.map(a => { const nm = D.acts[a.ac], f = D.fun[nm], v = a.eff >= 75 ? "Proven" : a.eff >= 45 ? "Moderate" : "Weak"; return `<details style="margin:4px 0"><summary>${f ? f.e : ""} ${esc(nm)} <span class="tag ${v}">${a.eff.toFixed(0)}% effective</span>${v === "Weak" ? ' <span class="note">avoid as sole action</span>' : ""}</summary>${f ? `<ol class="steps">${f.s.map(s => `<li>${esc(s)}</li>`).join("")}</ol>` : ""}</details>`; }).join("")}</div>`).join("")}</div></div>`;
+}
+
+/* ---------------- model trust ---------------- */
+function trust() {
+  const P = D.perf, el = $("#p-trust"); if (!P) { el.innerHTML = `<div class="card">Metrics unavailable in this build.</div>`; return; }
+  const c = P.classifier, r = P.risk, cls = c.classes, f1 = v => (v == null ? "–" : (v * 100).toFixed(1) + "%");
+  const kp = (v, l) => `<div><b>${v}</b><span>${l}</span></div>`, op = r.operating_points;
+  el.innerHTML = `<div class="card"><h3>How much can you trust these predictions?</h3><p class="sub">All numbers below are measured on data the models never saw during training.</p>
+  <div class="grid g3"><div class="trustbox"><b>Sensitivity</b><br><span class="note">Of the cases that really happened, how many did we catch?</span></div><div class="trustbox"><b>Specificity</b><br><span class="note">Of the cases that did not happen, how many did we correctly leave alone? Low specificity = false alarms.</span></div><div class="trustbox"><b>Confidence</b><br><span class="note">How sure the model is about one single prediction (probability for the text model, bootstrap interval for the risk model).</span></div></div></div>
+  <h2>1 · Complaint text classifier</h2>
+  <div class="card"><div class="mini">${kp(f1(c.accuracy), "accuracy (" + c.n_test.toLocaleString() + " held-out complaints)")}${kp(f1(c.cv_mean) + " ± " + (c.cv_std * 100).toFixed(1), "5-fold cross-validation")}${kp(f1(c.macro_sensitivity), "macro sensitivity")}${kp(f1(c.macro_specificity), "macro specificity")}${kp(c.macro_f1.toFixed(2), "macro F1")}${kp(f1(c.acc_high_conf), "accuracy when confidence ≥ 80% (" + pct(c.share_high_conf) + " of complaints)")}${kp(f1(c.acc_low_conf), "accuracy when confidence < 55% (" + pct(c.share_low_conf, 1) + ") → human review")}</div>
+  <div class="grid g32"><div><table class="t"><thead><tr><th>Complaint type</th><th>Sensitivity</th><th>Specificity</th><th>Precision</th><th>n</th></tr></thead><tbody>${c.per_class.map(x => `<tr><td>${esc(x.cls)}</td><td><div style="display:flex;gap:6px;align-items:center"><div class="bar" style="width:70px"><i style="width:${(x.sensitivity || 0) * 100}%"></i></div>${f1(x.sensitivity)}</div></td><td><div style="display:flex;gap:6px;align-items:center"><div class="bar" style="width:70px"><i style="width:${(x.specificity || 0) * 100}%;background:#1baf7a"></i></div>${f1(x.specificity)}</div></td><td>${f1(x.precision)}</td><td>${x.support}</td></tr>`).join("")}</tbody></table></div>
+  <div><b class="note">Confusion matrix (rows = actual, columns = predicted)</b>${heat(cls.map(sh), cls.map(x => sh(x).slice(0, 5)), c.confusion, {})}</div></div>
+  <p class="note">The demo complaint text is generated from templates, so it is cleaner than real customer wording. Expect lower numbers on real ABT-CPD text and re-measure.</p></div>
+  <h2>2 · Next-month risk model</h2>
+  <div class="card"><div class="mini">${kp(r.auc.toFixed(2), "AUC · 90% CI " + r.auc_lo.toFixed(2) + "–" + r.auc_hi.toFixed(2))}${kp(f1(r.sensitivity), "sensitivity at alert threshold " + pct(r.threshold))}${kp(f1(r.specificity), "specificity (target ≥ " + pct(r.min_spec_target) + ")")}${kp(f1(r.precision), "precision: alerts that came true")}${kp(f1(r.npv), "negative predictive value")}${kp(pct(r.base_rate), "base rate: product-months with a complaint")}</div>
+  <p class="note">Test period: ${esc(r.test_from)} onwards (${r.n_test.toLocaleString()} product-category-months). The alert threshold was chosen on an earlier validation year to keep false alarms at or below 30%, never tuned on the test period.</p>
+  <div class="grid g3"><div><b class="note">Confusion matrix at the alert threshold</b><table class="t" style="margin-top:6px"><thead><tr><th></th><th>Alert</th><th>No alert</th></tr></thead><tbody><tr><td><b>Complaint happened</b></td><td>${r.tp} <span class="note">caught</span></td><td>${r.fn} <span class="note">missed</span></td></tr><tr><td><b>No complaint</b></td><td>${r.fp} <span class="note">false alarm</span></td><td>${r.tn} <span class="note">correctly quiet</span></td></tr></tbody></table></div>
+  <div><b class="note">Choose your trade-off</b><table class="t" style="margin-top:6px"><thead><tr><th>Threshold</th><th>Sens.</th><th>Spec.</th><th>Prec.</th></tr></thead><tbody>${op.map(o => `<tr style="${Math.abs(o.threshold - r.threshold) < .005 ? "font-weight:700;background:#eef4fc" : ""}"><td>${pct(o.threshold)}${Math.abs(o.threshold - r.threshold) < .005 ? " ◀ used" : ""}</td><td>${f1(o.sensitivity)}</td><td>${f1(o.specificity)}</td><td>${f1(o.precision)}</td></tr>`).join("")}</tbody></table></div>
+  <div><b class="note">Calibration: when the model says X%, how often does it happen?</b><div class="chartbox" style="height:230px"><canvas id="c-cal"></canvas></div></div></div>
+  <h3 style="margin-top:14px">Skill by complaint type (AUC, 0.5 = chance)</h3>${bars(r.per_category.map(x => ({n: x.category, v: x.auc, c: x.auc >= .7 ? BLUE : GREY})), BLUE, v => v.toFixed(2))}
+  <div class="alert amber" style="margin:12px 0 0"><span style="font-size:20px">⚠️</span><div><b>Be honest about it:</b> AUC ${r.auc.toFixed(2)} means the model ranks risk better than chance but is not sharp. At this threshold it catches ${f1(r.sensitivity)} of real complaints and wrongly alerts on ${f1(1 - r.specificity)} of quiet cases. Use it to prioritise inspections, not as a verdict. Probabilities are well calibrated, so a 70% prediction really does come true about 70% of the time. Results on real data will differ and must be re-validated.</div></div></div>`;
+  mk("c-cal", {type: "scatter", data: {datasets: [{label: "Perfect calibration", data: [{x: 0, y: 0}, {x: 1, y: 1}], showLine: true, borderColor: GREY, borderDash: [5, 4], pointRadius: 0, borderWidth: 1.5}, {label: "Observed", data: r.calibration.map(k => ({x: k.pred, y: k.obs, n: k.n})), showLine: true, borderColor: BLUE, backgroundColor: BLUE, pointRadius: 5, borderWidth: 2}]},
+    options: {scales: {x: {min: 0, max: 1, title: {display: true, text: "predicted probability"}, grid}, y: {min: 0, max: 1, title: {display: true, text: "observed frequency"}, grid}}, plugins: {tooltip: {callbacks: {label: k => k.raw.n ? ` predicted ${pct(k.raw.x)} → happened ${pct(k.raw.y)} (n=${k.raw.n})` : ""}}}}});
+}
+
+/* ---------------- live AI ---------------- */
+let LA = null;
+function live() {
+  const el = $("#p-live"), today = new Date().toISOString().slice(0, 10);
+  el.innerHTML = `<div class="grid g2"><div class="card"><h3>🤖 Analyse a new complaint with the live models</h3><p class="sub">${LIVE ? "Connected to the Python models running on this computer." : "Open this page through <b>python server.py</b> to use the live models (this file was opened without the server)."}</p>
+  <div class="grid g2"><label class="note">Product<select id="lp" style="width:100%">${D.prods.map((p, i) => `<option value="${i}">${p}</option>`).join("")}</select></label><label class="note">Customer<select id="lc" style="width:100%">${D.custs.map((p, i) => `<option value="${i}">${p}</option>`).join("")}</select></label></div>
+  <label class="note" style="display:block;margin:8px 0">Date<br><input type="date" id="ld" value="${today}" style="font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px"></label>
+  <label class="note">Complaint description</label><textarea id="lt" placeholder="e.g. Metal fragment found in Spice Mix pouch by customer"></textarea>
+  <p style="margin:10px 0 0"><button class="btn" id="lgo" ${LIVE ? "" : "disabled"}>Analyse complaint</button> <span class="note">Try: “Live weevils in the rice flour pack” or “Pouch burst during transit”</span></p></div>
+  <div class="card" id="lres"><h3>Result</h3><p class="note">The category, the model's confidence, likely root causes, proven preventive actions and next-month risk will appear here.</p></div></div>`;
+  $("#lgo").onclick = analyse; if (LA) showLA();
+}
+async function analyse() {
+  const text = $("#lt").value.trim(), p = +$("#lp").value, cu = +$("#lc").value, date = $("#ld").value; if (text.length < 5) { $("#lres").innerHTML = `<h3>Result</h3><p class="bad">Please describe the complaint in a few words.</p>`; return; }
+  $("#lres").innerHTML = `<h3>Result</h3><p><span class="spin">⏳</span> Analysing…</p>`;
+  try { const j = await (await fetch("/api/classify", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text})})).json(); if (j.error) throw j.error; LA = {j, p, cu, date, text, cat: D.cats.indexOf(j.category)}; showLA(); }
+  catch (e) { $("#lres").innerHTML = `<h3>Result</h3><p class="bad">Could not reach the live models: ${esc(e)}. Start them with <code>python server.py</code>.</p>`; }
+}
+function showLA() {
+  const {j, p, cu, date, text} = LA, cat = LA.cat, col = ({High: "#1baf7a", Medium: AMBER, Low: RED})[j.confidence_level];
+  const sub = R.filter(r => r.p === p && r.ca === cat && r.rc >= 0), rcs = [...count(sub, r => r.rc).entries()].sort((a, b) => b[1] - a[1]).slice(0, 3), rk = riskMap[p] && riskMap[p][cat];
+  const acts = [], seenA = new Set(); rcs.forEach(([rc]) => actStats(rc).filter(a => a.eff >= 45).slice(0, 2).forEach(a => { if (!seenA.has(a.ac)) { seenA.add(a.ac); acts.push({rc, ...a}); } }));
+  $("#lres").innerHTML = `<h3>Result</h3><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="font-size:22px;font-weight:750">${esc(j.category)}</span><span class="ct ${j.confidence_level}">Confidence: ${j.confidence_level} · ${pct(j.confidence, 1)}</span></div>
+  <div class="meter" style="margin:8px 0"><i style="width:${j.confidence * 100}%;background:${col}"></i></div><p class="note" style="margin:0 0 8px">${esc(j.note)}</p>
+  <b class="note">Other possibilities</b>${bars(j.top3.map(x => ({n: x.category, v: x.probability * 100})), BLUE, v => v.toFixed(1) + "%")}
+  ${rk ? `<p style="margin:10px 0 4px"><b>Next-month risk of ${esc(j.category)} for ${esc(D.prods[p])}:</b> ${pct(rk.prob)} ${rk.lo != null ? `(90% interval ${pct(rk.lo)}–${pct(rk.hi)})` : ""} ${rk.conf ? `<span class="ct ${rk.conf}">Confidence: ${rk.conf}</span>` : ""}</p>` : ""}
+  ${rcs.length ? `<b class="note">Likely root causes</b>${bars(rcs.map(([k, v]) => ({n: D.rcs[k], v: v / sub.length * 100})), BLUE, v => v.toFixed(0) + "%")}` : ""}
+  ${acts.length ? `<b class="note">Preventive actions that worked before</b>${acts.map(a => { const f = D.fun[D.acts[a.ac]]; return `<details style="margin:4px 0"><summary>${f ? f.e : ""} ${esc(D.acts[a.ac])} <span class="tag ${a.eff >= 75 ? "Proven" : "Moderate"}">${a.eff.toFixed(0)}%</span> <span class="note">for ${esc(D.rcs[a.rc])}</span></summary>${f ? `<ol class="steps">${f.s.map(s => `<li>${esc(s)}</li>`).join("")}</ol>` : ""}</details>`; }).join("")}` : ""}
+  <hr style="border:0;border-top:1px solid var(--line);margin:12px 0"><label class="note">Category to save ${j.needs_review ? "(please confirm: low confidence)" : "(change it if the model is wrong)"}<select id="lsc" style="width:100%;margin-top:4px">${D.cats.map((c, i) => `<option value="${i}" ${i === cat ? "selected" : ""}>${c}</option>`).join("")}</select></label>
+  <p style="margin:10px 0 0"><button class="btn" id="lsave">💾 Save and retrain the models</button> <span class="note" id="lmsg">Appends to data/complaints.csv, then retrains (about 10–15 s).</span></p>`;
+  $("#lsave").onclick = save;
+}
+async function save() {
+  const {p, cu, date, text} = LA, cat = D.cats[+$("#lsc").value]; $("#lsave").disabled = true; $("#lmsg").innerHTML = `<span class="spin">⏳</span> Saving and retraining all models…`;
+  try { const j = await (await fetch("/api/complaint", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({date, customer: D.custs[cu], product: D.prods[p], text, category: cat})})).json(); if (j.error) throw j.error;
+    $("#lmsg").innerHTML = `✅ Saved as ${esc(j.complaint_id)}. Models retrained in ${j.retrained_seconds}s. Reloading…`; LA = null; setTimeout(() => location.reload(), 900); }
+  catch (e) { $("#lmsg").innerHTML = `<span class="bad">Save failed: ${esc(e)}</span>`; $("#lsave").disabled = false; }
+}
+
+/* ---------------- 8 quest ---------------- */
+const LV = [[0, "Rookie Guardian", "🛡️"], [150, "Quality Scout", "🔍"], [350, "Prevention Pro", "⚡"], [600, "Zero-Complaint Hero", "🏆"]];
+const PTS = {done: 100, wip: 40, not: 10};
+const MSG = {done: ["Legend! One fewer complaint waiting to happen.", "Brilliant. That's how zero gets built.", "Yes! Your customers will never know what they didn't get."], wip: ["Progress counts. We'll check back in a week.", "Nice, keep going. Half the battle is starting."], not: ["Thanks for being honest. Honest answers earn points too!", "No stress. Knowing the gap is step one."]};
+let Q = {a: {}, combo: 0, focus: null, pending: null};
+try { const s = JSON.parse(localStorage.getItem("zcc_quest_v2") || "null"); if (s && s.a) Q = Object.assign(Q, s, {pending: null, focus: null}); } catch (e) {}
+const saveQ = () => { try { localStorage.setItem("zcc_quest_v2", JSON.stringify({a: Q.a, combo: Q.combo})); } catch (e) {} };
+const xpOf = () => Object.values(Q.a).reduce((s, a) => s + a.xp + (a.r ? 10 : 0), 0);
+function level(xp) { let i = 0; LV.forEach((l, k) => { if (xp >= l[0]) i = k; }); return {i, cur: LV[i], next: LV[i + 1]}; }
+function shield() {
+  const cells = {}; D.missions.forEach(m => { const k = m.product + "|" + m.category; (cells[k] = cells[k] || {p: m.risk, f: 1}); const a = Q.a[m.id], w = a ? (a.s === "done" ? 1 : a.s === "wip" ? .4 : 0) : 0; cells[k].f *= 1 - .5 * m.eff / 100 * w; });
+  const before = Object.values(cells).reduce((s, c) => s + c.p, 0), after = Object.values(cells).reduce((s, c) => s + c.p * c.f, 0); return {before, after, cut: before ? 1 - after / before : 0};
+}
+const BADGES = [["🌱", "First Step", () => Object.keys(Q.a).length >= 1], ["🔥", "On Fire (3 Done)", () => Object.values(Q.a).filter(a => a.s === "done").length >= 3], ["🤝", "Honest Hero (all answered)", () => D.missions.every(m => Q.a[m.id])],
+  ["🛡️", "Shield 50%", () => shield().cut >= .5], ["🏆", "Zero Hero (all Done)", () => D.missions.every(m => Q.a[m.id] && Q.a[m.id].s === "done")],
+  ...[...new Set(D.missions.map(m => m.category))].slice(0, 2).map(c => [CATEMO(c), sh(c) + " Slayer", () => D.missions.filter(m => m.category === c).every(m => Q.a[m.id] && Q.a[m.id].s === "done")])];
+function CATEMO(c) { return ({"Infestation": "🐛", "Contamination / Foreign Matter": "🧲", "Packaging Issue": "📦"})[c] || "⭐"; }
+function quest() {
+  const ms = D.missions, el = $("#p-quest"), xp = xpOf(), lv = level(xp), sd = shield(), answered = ms.filter(m => Q.a[m.id]).length;
+  const cur = Q.pending ? ms.find(m => m.id === Q.pending) : Q.focus ? ms.find(m => m.id === Q.focus) : ms.find(m => !Q.a[m.id]);
+  const next7 = new Date(Date.now() + 7 * 864e5).toLocaleDateString(undefined, {day: "numeric", month: "short"});
+  let card = "";
+  if (!cur) {
+    const done = ms.filter(m => Q.a[m.id] && Q.a[m.id].s === "done").length;
+    card = `<div class="qcard enter"><div class="qemoji">${done === ms.length ? "🏆" : "🎉"}</div><h3>${done === ms.length ? "Quest complete: every shield is up!" : "Quest complete!"}</h3><p class="qwhy">You answered all ${ms.length} missions: <b>${done} done</b>, ${ms.filter(m => Q.a[m.id] && Q.a[m.id].s === "wip").length} in progress, ${ms.filter(m => Q.a[m.id] && Q.a[m.id].s === "not").length} still to start. Predicted complaint risk neutralised: <b>${(sd.cut * 100).toFixed(0)}%</b> (estimate). We'll ask again around <b>${next7}</b>.</p>
+    <div class="ans" style="margin-top:14px"><button class="y" id="qdl">⬇️ Download my answers (CSV)<small>share with your quality team</small></button><button class="w" id="qrev">✏️ Review &amp; change answers</button><button class="n" id="qreset">🔄 Start over</button></div></div>`;
+    setTimeout(() => answered === ms.length && !Q.celebrated && (Q.celebrated = true, confetti(120)), 200);
+  } else if (Q.pending === cur.id) {
+    card = `<div class="qcard enter"><div class="qemoji">🎉</div><h3>Awesome! How did it feel?</h3><p class="qwhy">Quick tap, it helps the next team. (+10 XP)</p><div class="react" style="display:flex;gap:12px;justify-content:center;margin:14px 0"><button data-r="😅" title="Tough">😅</button><button data-r="🙂" title="Fine">🙂</button><button data-r="🤩" title="Easy">🤩</button></div><button class="btn alt" id="qskip">Skip</button></div>`;
+  } else {
+    const prev = Q.a[cur.id], idx = ms.indexOf(cur), why = `${cur.root_cause} causes about ${cur.likelihood.toFixed(0)}% of ${sh(cur.category).toLowerCase()} complaints on ${cur.product}.`;
+    card = `<div class="qcard enter" id="qc"><div class="prog" title="Mission progress">${ms.map((m, i) => `<i class="${m === cur ? "c" : Q.a[m.id] ? ({done: "d", wip: "w", not: "n"})[Q.a[m.id].s] : ""}"></i>`).join("")}</div>
+    <div class="qemoji">${cur.emoji}</div><div class="note" style="margin-top:6px">Mission ${idx + 1} of ${ms.length}</div><h3>${esc(cur.name)}</h3>
+    <div class="qmeta"><span class="chip">${esc(cur.product)}</span><span class="chip">${esc(sh(cur.category))}</span><span class="chip r">${pct(cur.risk)} risk next month</span><span class="chip">${cur.eff.toFixed(0)}% proven</span></div>
+    <p class="qwhy">${esc(why)}</p><div class="qplay"><b>The play:</b> ${esc(cur.action)}<details style="margin-top:6px"><summary>Show me how →</summary><ol class="steps">${cur.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol></details></div>
+    <div class="qq">Is this already in place at your plant?</div>
+    <div class="ans"><button class="y" data-s="done">🎉 Yes, done!<small>+100 XP · combo bonus</small></button><button class="w" data-s="wip">🔧 Working on it<small>+40 XP</small></button><button class="n" data-s="not">⏳ Not yet<small>+10 XP · honesty counts</small></button></div>
+    ${prev ? `<p class="note" style="margin-top:10px">Your current answer: <b>${({done: "Done", wip: "Working on it", not: "Not yet"})[prev.s]}</b>. Tap to change it.</p>` : ""}<div class="toast" id="toast" aria-live="polite"></div></div>`;
+  }
+  const cols = [["done", "✅ Done"], ["wip", "🔧 Working on it"], ["not", "⏳ Not yet"], [null, "🎯 To do"]];
+  el.innerHTML = `<div class="questbg"><div style="margin-bottom:14px"><h2 style="margin:0 0 2px">🎮 Prevention Quest</h2><p class="note" style="margin:0;color:#7a5a20">We predicted your riskiest spots. Tell us which proven fixes are already in place: no wrong answers, honest answers earn XP too.</p></div>
+  <div class="qgrid"><div>${card}</div>
+  <div class="hero"><div class="lvl"><div class="av">${lv.cur[2]}</div><div><b>${lv.cur[1]}</b><div class="note">${xp} XP${lv.next ? ` · ${lv.next[0] - xp} to ${lv.next[1]}` : " · max level!"}</div></div><div style="margin-left:auto;text-align:center"><div style="font-size:26px">${Q.combo >= 2 ? "🔥" : "✨"}</div><div class="note">combo ×${Q.combo}</div></div></div>
+   <div class="xpbar"><i style="width:${lv.next ? (xp - lv.cur[0]) / (lv.next[0] - lv.cur[0]) * 100 : 100}%"></i></div>
+   <div class="shield"><b>🛡️ Risk shield: ${(sd.cut * 100).toFixed(0)}% neutralised</b><div class="ring"><i style="width:${sd.cut * 100}%"></i></div><div class="note">Expected complaint events next month: ${sd.before.toFixed(1)} → <b>${sd.after.toFixed(1)}</b>. Estimate assumes each fix delivers half its historical effectiveness.</div></div>
+   <div class="badges">${BADGES.map(b => `<div class="badge ${b[2]() ? "on" : ""}"><span>${b[0]}</span>${esc(b[1])}</div>`).join("")}</div></div></div>
+  <div class="board">${cols.map(([s, t]) => `<div class="col"><h4>${t}</h4>${ms.filter(m => s ? Q.a[m.id] && Q.a[m.id].s === s : !Q.a[m.id]).map(m => `<button class="mchip" data-id="${m.id}">${m.emoji} ${esc(m.name)} <span class="note">· ${esc(m.product)}</span></button>`).join("")}</div>`).join("")}</div></div>`;
+  $$(".ans [data-s]", el).forEach(b => b.onclick = ev => answer(cur, b.dataset.s, ev));
+  $$(".react [data-r]", el).forEach(b => b.onclick = () => { Q.a[Q.pending].r = b.dataset.r; Q.pending = null; Q.focus = null; saveQ(); toast2("Thanks! +10 XP"); quest(); });
+  $("#qskip", el) && ($("#qskip", el).onclick = () => { Q.pending = null; Q.focus = null; quest(); });
+  $$(".mchip", el).forEach(b => b.onclick = () => { Q.focus = b.dataset.id; Q.celebrated = false; quest(); window.scrollTo({top: el.offsetTop - 80, behavior: "smooth"}); });
+  $("#qdl", el) && ($("#qdl", el).onclick = dl); $("#qrev", el) && ($("#qrev", el).onclick = () => { Q.focus = ms[0].id; quest(); });
+  $("#qreset", el) && ($("#qreset", el).onclick = () => { if (confirm("Clear all your answers and start over?")) { Q = {a: {}, combo: 0, focus: null, pending: null}; saveQ(); quest(); } });
+}
+function toast2(t) { const e = $("#toast"); if (e) e.textContent = t; }
+function answer(m, s, ev) {
+  const was = Q.a[m.id]; Q.combo = s === "done" ? Q.combo + 1 : 0;
+  const bonus = s === "done" ? Math.min(Q.combo - 1, 3) * 10 : 0, xp = PTS[s] + bonus;
+  Q.a[m.id] = {s, xp, r: was && was.s === s ? was.r : null, t: new Date().toISOString()}; saveQ();
+  const f = document.createElement("div"); f.className = "float"; f.textContent = "+" + xp + " XP"; f.style.left = ev.clientX - 20 + "px"; f.style.top = ev.clientY - 20 + "px"; document.body.appendChild(f); setTimeout(() => f.remove(), 1200);
+  if (s === "done") confetti(60);
+  const msg = MSG[s][Math.floor(Math.random() * MSG[s].length)]; toast2(msg);
+  const card = $("#qc"); card && card.classList.add("leave");
+  setTimeout(() => { Q.focus = null; Q.pending = (s === "done" && !Q.a[m.id].r) ? m.id : null; quest(); }, 380);
+}
+function dl() {
+  const rows = [["mission", "product", "complaint_type", "preventive_action", "status", "reaction", "answered_at"]];
+  D.missions.forEach(m => { const a = Q.a[m.id] || {}; rows.push([m.name, m.product, m.category, m.action, ({done: "Implemented", wip: "In progress", not: "Not yet"})[a.s] || "Unanswered", a.r || "", a.t || ""]); });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n"), b = new Blob([csv], {type: "text/csv"}), a = document.createElement("a");
+  a.href = URL.createObjectURL(b); a.download = "prevention_quest_answers.csv"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 500);
+}
+function confetti(n) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = $("#conf"), cx = cv.getContext("2d"); cv.width = innerWidth; cv.height = innerHeight; const cols = ["#eda100", "#eb6834", "#2a78d6", "#1baf7a", "#e87ba4", "#6250d6"];
+  const ps = Array.from({length: n}, () => ({x: innerWidth / 2 + (Math.random() - .5) * 300, y: innerHeight * .55, vx: (Math.random() - .5) * 12, vy: -Math.random() * 13 - 4, s: 5 + Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)], r: Math.random() * 6, vr: (Math.random() - .5) * .4}));
+  let t = 0; (function f() { cx.clearRect(0, 0, cv.width, cv.height); ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .35; p.r += p.vr; cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore(); }); if (++t < 90) requestAnimationFrame(f); else cx.clearRect(0, 0, cv.width, cv.height); })();
+}
+
+/* ---------------- boot ---------------- */
+$("#asof").textContent = `Data to ${D.asof} · forecast for ${D.forecast}`;
+$("#foot").innerHTML = `All figures come from a synthetic 19-year complaint history shaped like the ABT-CPD brief (${D.n.toLocaleString()} complaints). Risk predictions are probabilities, not certainties. Quest answers are stored only in this browser.`;
+buildFilters(); { let t0 = "overview"; try { t0 = sessionStorage.getItem("zcc_tab") || "overview"; } catch (e) {} go(TABS.some(x => x[0] === t0) ? t0 : "overview"); }
+</script>
+</body>
+</html>
